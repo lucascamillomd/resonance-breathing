@@ -57,9 +57,10 @@ struct HomeView: View {
                 }
             }
             .fullScreenCover(isPresented: $showSession) {
-                SessionView(onEnd: {
+                SessionView { session in
                     showSession = false
-                })
+                    completedSession = session
+                }
             }
             .sheet(item: $completedSession) { session in
                 SummaryView(session: session)

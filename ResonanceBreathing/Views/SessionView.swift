@@ -3,37 +3,36 @@ import SwiftData
 import BreathingCore
 
 struct SessionView: View {
-    @StateObject private var timer = BreathingTimer()
-    @State private var heartRate: Double = 0
-    @State private var rmssd: Double = 0
-    @State private var coherence: Double = 0
-    @State private var hrvData: [HRVDataPoint] = []
-    @State private var isAdapting = true
-
-    let onEnd: () -> Void
+    @StateObject private var sessionManager = SessionManager()
+    @Environment(\.modelContext) private var modelContext
+    let onEnd: (BreathingSession?) -> Void
 
     var body: some View {
         ZStack {
             AppTheme.background.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                MetricsBarView(heartRate: heartRate, rmssd: rmssd, coherence: coherence)
-                    .padding(.top, 8)
+                MetricsBarView(
+                    heartRate: sessionManager.heartRate,
+                    rmssd: sessionManager.rmssd,
+                    coherence: sessionManager.coherence
+                )
+                .padding(.top, 8)
 
                 Spacer()
 
                 BloomAnimationView(
-                    phase: timer.currentPhase,
-                    progress: timer.phaseProgress,
-                    coherence: coherence
+                    phase: sessionManager.timer.currentPhase,
+                    progress: sessionManager.timer.phaseProgress,
+                    coherence: sessionManager.coherence
                 )
                 .frame(width: 250, height: 250)
 
                 VStack(spacing: 4) {
-                    Text(timer.currentPhase.label)
+                    Text(sessionManager.timer.currentPhase.label)
                         .font(.system(.title3, design: .rounded, weight: .medium))
                         .foregroundStyle(AppTheme.primaryText)
-                    Text(String(format: "%.1fs", timer.phaseTimeRemaining))
+                    Text(String(format: "%.1fs", sessionManager.timer.phaseTimeRemaining))
                         .font(.system(.caption, design: .monospaced))
                         .foregroundStyle(AppTheme.secondaryText)
                 }
@@ -42,9 +41,9 @@ struct SessionView: View {
                 Spacer()
 
                 HRVChartView(
-                    dataPoints: hrvData,
-                    breathingRate: timer.parameters.breathsPerMinute,
-                    isAdapting: isAdapting
+                    dataPoints: sessionManager.hrvDataPoints,
+                    breathingRate: sessionManager.timer.parameters.breathsPerMinute,
+                    isAdapting: sessionManager.pacer.sessionPhase != .resonanceLock
                 )
                 .padding(.bottom, 16)
             }
@@ -52,10 +51,7 @@ struct SessionView: View {
             VStack {
                 HStack {
                     Spacer()
-                    Button(action: {
-                        timer.stop()
-                        onEnd()
-                    }) {
+                    Button(action: endSession) {
                         Image(systemName: "xmark.circle.fill")
                             .font(.title2)
                             .foregroundStyle(AppTheme.secondaryText)
@@ -65,7 +61,12 @@ struct SessionView: View {
                 Spacer()
             }
         }
-        .onAppear { timer.start() }
-        .onDisappear { timer.stop() }
+        .onAppear { sessionManager.startSession() }
+        .onDisappear { if sessionManager.isActive { endSession() } }
+    }
+
+    private func endSession() {
+        let session = sessionManager.endSession(modelContext: modelContext)
+        onEnd(session)
     }
 }
