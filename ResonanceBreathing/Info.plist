@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>NSHealthShareUsageDescription</key>
+    <string>Resonance Breathing needs access to your heart rate data to provide real-time HRV biofeedback during breathing sessions.</string>
+    <key>NSHealthUpdateUsageDescription</key>
+    <string>Resonance Breathing saves workout sessions to track your breathing practice.</string>
+</dict>
+</plist>

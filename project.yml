@@ -1,0 +1,58 @@
+name: ResonanceBreathing
+options:
+  bundleIdPrefix: com.lucascamillo
+  deploymentTarget:
+    iOS: "17.0"
+    watchOS: "10.0"
+  xcodeVersion: "15.0"
+  createIntermediateGroups: true
+
+packages:
+  BreathingCore:
+    path: Packages/BreathingCore
+
+targets:
+  ResonanceBreathing:
+    type: application
+    platform: iOS
+    sources:
+      - ResonanceBreathing
+    dependencies:
+      - package: BreathingCore
+    settings:
+      base:
+        INFOPLIST_FILE: ResonanceBreathing/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.lucascamillo.resonancebreathing
+        SWIFT_VERSION: "5.9"
+        SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
+        SUPPORTS_MACCATALYST: false
+    entitlements:
+      path: ResonanceBreathing/ResonanceBreathing.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+        com.apple.developer.healthkit.access: []
+    scheme:
+      testTargets: []
+      gatherCoverageData: false
+
+  ResonanceBreathingWatch Watch App:
+    type: application
+    platform: watchOS
+    sources:
+      - "ResonanceBreathingWatch Watch App"
+    dependencies:
+      - package: BreathingCore
+    settings:
+      base:
+        INFOPLIST_FILE: "ResonanceBreathingWatch Watch App/Info.plist"
+        PRODUCT_BUNDLE_IDENTIFIER: com.lucascamillo.resonancebreathing.watchkitapp
+        SWIFT_VERSION: "5.9"
+        SUPPORTED_PLATFORMS: "watchos watchsimulator"
+    entitlements:
+      path: "ResonanceBreathingWatch Watch App/ResonanceBreathingWatch.entitlements"
+      properties:
+        com.apple.developer.healthkit: true
+        com.apple.developer.healthkit.access: []
+    scheme:
+      testTargets: []
+      gatherCoverageData: false

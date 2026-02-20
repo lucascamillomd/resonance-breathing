@@ -1,0 +1,16 @@
+# Xcode
+build/
+DerivedData/
+*.xcuserdata
+*.xcworkspace
+xcuserdata/
+
+# Swift Package Manager
+.build/
+Packages/BreathingCore/.build/
+
+# OS files
+.DS_Store
+
+# Generated Xcode project (regenerated via xcodegen)
+ResonanceBreathing.xcodeproj/
