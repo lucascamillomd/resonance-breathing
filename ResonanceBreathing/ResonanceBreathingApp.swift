@@ -7,6 +7,7 @@ struct ResonanceBreathingApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: [BreathingSession.self, UserSettings.self])
     }
 }
 
