@@ -27,7 +27,15 @@ struct SessionView: View {
                     MetricsBarView(
                         heartRate: sessionManager.heartRate,
                         rmssd: sessionManager.rmssd,
-                        coherence: sessionManager.coherence
+                        coherence: sessionManager.coherence,
+                        estimatedRF: sessionManager.pacer.estimatedResonanceFrequency,
+                        pacerPhase: {
+                            switch sessionManager.pacer.phase {
+                            case .warmup: return "Warming up"
+                            case .exploring: return "Exploring"
+                            case .converged: return "Locked"
+                            }
+                        }()
                     )
 
                     Button(action: endSession) {
