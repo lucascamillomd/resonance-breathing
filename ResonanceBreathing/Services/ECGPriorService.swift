@@ -24,9 +24,7 @@ final class ECGPriorService {
             readTypes.insert(HKObjectType.electrocardiogramType())
         }
 
-        if let heartbeatType = HKSeriesType.heartbeat() as? HKObjectType {
-            readTypes.insert(heartbeatType)
-        }
+        readTypes.insert(HKSeriesType.heartbeat())
 
         try await healthStore.requestAuthorization(toShare: [], read: readTypes)
     }
