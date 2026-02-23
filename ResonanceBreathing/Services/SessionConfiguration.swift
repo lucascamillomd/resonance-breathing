@@ -29,11 +29,22 @@ struct SessionConfiguration: Equatable, Sendable {
             self = .default
             return
         }
-        self.init(
-            targetDuration: settings.defaultDuration,
-            startingBPM: settings.defaultBreathingRate,
-            hapticsEnabled: settings.hapticsEnabled,
-            useECGPrior: settings.useECGPrior
-        )
+        if let calibratedRate = settings.calibratedResonanceRate {
+            self.init(
+                targetDuration: settings.defaultDuration,
+                startingBPM: settings.defaultBreathingRate,
+                hapticsEnabled: settings.hapticsEnabled,
+                useECGPrior: false,
+                ecgPriorMean: calibratedRate,
+                ecgPriorStd: 0.2
+            )
+        } else {
+            self.init(
+                targetDuration: settings.defaultDuration,
+                startingBPM: settings.defaultBreathingRate,
+                hapticsEnabled: settings.hapticsEnabled,
+                useECGPrior: settings.useECGPrior
+            )
+        }
     }
 }

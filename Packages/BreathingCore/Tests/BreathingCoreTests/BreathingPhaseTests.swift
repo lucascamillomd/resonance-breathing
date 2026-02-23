@@ -5,7 +5,7 @@ final class BreathingPhaseTests: XCTestCase {
 
     func testPhaseCycleThroughInhaleHoldExhale() {
         let phase = BreathingPhase.inhale
-        XCTAssertEqual(phase.next, .hold)
+        XCTAssertEqual(phase.next, .exhale)
         XCTAssertEqual(BreathingPhase.hold.next, .exhale)
         XCTAssertEqual(BreathingPhase.exhale.next, .inhale)
     }

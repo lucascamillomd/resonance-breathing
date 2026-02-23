@@ -14,6 +14,8 @@
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundlePackageType</key>
     <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+    <key>UILaunchScreen</key>
+    <dict/>
     <key>NSHealthShareUsageDescription</key>
     <string>Resonance Breathing needs access to your heart rate data to provide real-time HRV biofeedback during breathing sessions.</string>
     <key>NSHealthUpdateUsageDescription</key>

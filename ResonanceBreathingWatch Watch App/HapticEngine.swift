@@ -3,29 +3,44 @@ import WatchKit
 
 final class HapticEngine: ObservableObject {
     @Published var currentPhase: String = "idle"
+    @Published var phaseProgress: Double = 0
 
     private var hapticTimer: Timer?
+    private var progressTimer: Timer?
     private var phaseStartTime: Date = .now
     private var inhaleDuration: Double = 4.36
-    private var holdDuration: Double = 0.55
-    private var exhaleDuration: Double = 6.0
+    private var exhaleDuration: Double = 6.55
 
     func updateParameters(inhale: Double, hold: Double, exhale: Double) {
-        inhaleDuration = inhale
-        holdDuration = hold
-        exhaleDuration = exhale
+        inhaleDuration = max(inhale, 0.1)
+        exhaleDuration = max(exhale, 0.1)
     }
 
     func start() {
         phaseStartTime = .now
         currentPhase = "inhale"
+        phaseProgress = 0
         scheduleNextTick()
+        startProgressUpdates()
     }
 
     func stop() {
         hapticTimer?.invalidate()
         hapticTimer = nil
+        progressTimer?.invalidate()
+        progressTimer = nil
         currentPhase = "idle"
+        phaseProgress = 0
+    }
+
+    private func startProgressUpdates() {
+        progressTimer?.invalidate()
+        progressTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30.0, repeats: true) { [weak self] _ in
+            guard let self else { return }
+            let elapsed = Date.now.timeIntervalSince(self.phaseStartTime)
+            let duration = self.currentPhase == "inhale" ? self.inhaleDuration : self.exhaleDuration
+            self.phaseProgress = min(elapsed / max(duration, 0.1), 1.0)
+        }
     }
 
     private func scheduleNextTick() {
@@ -38,26 +53,29 @@ final class HapticEngine: ObservableObject {
 
     private func tick() {
         let elapsed = Date.now.timeIntervalSince(phaseStartTime)
+        let device = WKInterfaceDevice.current()
 
         switch currentPhase {
         case "inhale":
-            WKInterfaceDevice.current().play(.directionUp)
-            if elapsed >= inhaleDuration {
-                transitionTo("hold")
-            } else {
-                scheduleNextTick()
+            // Double-tap: directionUp + immediate retry for a strong "rising" feel
+            device.play(.directionUp)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) {
+                device.play(.directionUp)
             }
-        case "hold":
-            WKInterfaceDevice.current().play(.click)
-            if elapsed >= holdDuration {
-                transitionTo("exhale")
+            if elapsed >= inhaleDuration {
+                fireTransitionBurst {
+                    self.transitionTo("exhale")
+                }
             } else {
                 scheduleNextTick()
             }
         case "exhale":
-            WKInterfaceDevice.current().play(.directionDown)
+            // Single directionDown — softer, contrasts with the double-tap inhale
+            device.play(.directionDown)
             if elapsed >= exhaleDuration {
-                transitionTo("inhale")
+                fireTransitionBurst {
+                    self.transitionTo("inhale")
+                }
             } else {
                 scheduleNextTick()
             }
@@ -66,10 +84,26 @@ final class HapticEngine: ObservableObject {
         }
     }
 
+    /// Triple notification burst — strongest possible signal for phase switch
+    private func fireTransitionBurst(then completion: @escaping () -> Void) {
+        let device = WKInterfaceDevice.current()
+        device.play(.notification)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+            device.play(.notification)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                device.play(.notification)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    completion()
+                }
+            }
+        }
+    }
+
     private func transitionTo(_ phase: String) {
         currentPhase = phase
         phaseStartTime = .now
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+        phaseProgress = 0
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             self?.scheduleNextTick()
         }
     }
@@ -78,13 +112,13 @@ final class HapticEngine: ObservableObject {
         let elapsed = Date.now.timeIntervalSince(phaseStartTime)
         switch currentPhase {
         case "inhale":
-            let progress = min(elapsed / inhaleDuration, 1.0)
-            return 0.8 - progress * 0.5
-        case "hold":
-            return 0.6
+            // Very rapid accelerating double-taps: 0.25s → 0.12s
+            let progress = min(elapsed / max(inhaleDuration, 0.1), 1.0)
+            return max(0.12, 0.25 - progress * 0.13)
         case "exhale":
-            let progress = min(elapsed / exhaleDuration, 1.0)
-            return 0.3 + progress * 0.5
+            // Slower single taps: 0.2s → 0.7s
+            let progress = min(elapsed / max(exhaleDuration, 0.1), 1.0)
+            return max(0.15, 0.2 + progress * 0.5)
         default:
             return 1.0
         }

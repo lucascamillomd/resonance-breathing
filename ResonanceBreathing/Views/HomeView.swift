@@ -10,7 +10,6 @@ struct HomeView: View {
 
     @State private var showSession = false
     @State private var completedSession: BreathingSession?
-    @State private var ecgPrior: ECGPriorService.Prior?
     private let calendar = Calendar.current
 
     private var sessionConfiguration: SessionConfiguration {
@@ -125,11 +124,6 @@ struct HomeView: View {
             }
             .task {
                 _ = try? UserSettingsBootstrapper.ensureSettings(modelContext: modelContext)
-                if sessionConfiguration.useECGPrior {
-                    let service = ECGPriorService()
-                    try? await service.requestAuthorization()
-                    ecgPrior = await service.computePrior()
-                }
                 #if targetEnvironment(simulator)
                 if ProcessInfo.processInfo.arguments.contains("-autoStartSession") {
                     showSession = true
@@ -137,15 +131,7 @@ struct HomeView: View {
                 #endif
             }
             .fullScreenCover(isPresented: $showSession) {
-                let config: SessionConfiguration = {
-                    var c = sessionConfiguration
-                    if let prior = ecgPrior {
-                        c.ecgPriorMean = prior.meanBPM
-                        c.ecgPriorStd = prior.stdBPM
-                    }
-                    return c
-                }()
-                SessionView(configuration: config) { session in
+                SessionView(configuration: sessionConfiguration) { session in
                     showSession = false
                     if let session {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {

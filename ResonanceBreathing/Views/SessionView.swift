@@ -51,12 +51,15 @@ struct SessionView: View {
                 .padding(.top, 10)
 
                 VStack(spacing: 12) {
-                    BloomAnimationView(
+                    BreathingWaveformView(
+                        breathingBPM: sessionManager.timer.parameters.breathsPerMinute,
+                        elapsedSeconds: sessionManager.elapsedSeconds,
                         phase: sessionManager.timer.currentPhase,
-                        progress: sessionManager.timer.phaseProgress,
+                        phaseProgress: sessionManager.timer.phaseProgress,
+                        heartRateSamples: sessionManager.hrTimeSeries,
                         coherence: sessionManager.coherence
                     )
-                    .frame(width: 320, height: 320)
+                    .padding(.horizontal, 8)
 
                     Text(sessionManager.timer.currentPhase.label)
                         .font(.system(size: 28, weight: .medium, design: .rounded))

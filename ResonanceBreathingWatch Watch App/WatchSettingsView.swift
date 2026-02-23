@@ -29,13 +29,6 @@ struct WatchSettingsView: View {
         )
     }
 
-    private var ecgPriorEnabled: Binding<Bool> {
-        Binding(
-            get: { settings?.useECGPrior ?? false },
-            set: { settings?.useECGPrior = $0 }
-        )
-    }
-
     var body: some View {
         List {
             Section("Duration") {
@@ -66,11 +59,6 @@ struct WatchSettingsView: View {
                     .listRowBackground(Color.white.opacity(0.06))
             }
 
-            Section {
-                Toggle("ECG Prior", isOn: ecgPriorEnabled)
-                    .tint(Color(red: 0.38, green: 0.9, blue: 0.77))
-                    .listRowBackground(Color.white.opacity(0.06))
-            }
         }
         .navigationTitle("Settings")
     }

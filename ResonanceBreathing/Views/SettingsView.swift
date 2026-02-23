@@ -58,14 +58,19 @@ struct SettingsView: View {
                     }
 
                     Section("Calibration") {
-                        Toggle("ECG Prior", isOn: Binding(
-                            get: { settings.useECGPrior },
-                            set: { settings.useECGPrior = $0 }
-                        ))
-                        .tint(AppTheme.tint)
+                        NavigationLink(destination: CalibrationView()) {
+                            HStack {
+                                Text("Calibrate Resonance Rate")
+                                Spacer()
+                                if let rate = settings.calibratedResonanceRate {
+                                    Text(String(format: "%.1f bpm", rate))
+                                        .foregroundStyle(AppTheme.secondaryText)
+                                }
+                            }
+                        }
 
-                        if settings.useECGPrior {
-                            Text("Reads your most recent ECG recording to estimate your resonant frequency before each session.")
+                        if let date = settings.calibrationDate {
+                            Text("Last calibrated \(date.formatted(date: .abbreviated, time: .shortened))")
                                 .font(.system(size: 13, weight: .regular, design: .rounded))
                                 .foregroundStyle(AppTheme.tertiaryText)
                         }

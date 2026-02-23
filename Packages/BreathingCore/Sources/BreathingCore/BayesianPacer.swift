@@ -21,8 +21,8 @@ public final class BayesianPacer: @unchecked Sendable {
     public init(
         priorMean: Double = BreathingParameters.defaultBPM,
         priorStd: Double = 0.75,
-        warmupDuration: Double = 30.0,
-        convergenceThreshold: Double = 0.15,
+        warmupDuration: Double = 60.0,
+        convergenceThreshold: Double = 0.08,
         observationInterval: Double = 30.0
     ) {
         self.warmupDuration = warmupDuration

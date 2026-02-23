@@ -23,36 +23,66 @@ targets:
       base:
         INFOPLIST_FILE: ResonanceBreathing/Info.plist
         PRODUCT_BUNDLE_IDENTIFIER: com.lucascamillo.resonancebreathing
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: J9ARL486CP
+        CODE_SIGN_IDENTITY: Apple Development
         SWIFT_VERSION: "5.9"
         SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
+        TARGETED_DEVICE_FAMILY: "1"
         SUPPORTS_MACCATALYST: false
     entitlements:
       path: ResonanceBreathing/ResonanceBreathing.entitlements
       properties:
         com.apple.developer.healthkit: true
-        com.apple.developer.healthkit.access: []
     scheme:
-      testTargets: []
+      testTargets:
+        - ResonanceBreathingTests
       gatherCoverageData: false
+
+  ResonanceBreathingTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - ResonanceBreathingTests
+    dependencies:
+      - target: ResonanceBreathing
+      - package: BreathingCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.lucascamillo.resonancebreathing.tests
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: J9ARL486CP
+        CODE_SIGN_IDENTITY: Apple Development
+        GENERATE_INFOPLIST_FILE: true
+        SWIFT_VERSION: "5.9"
+        SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
 
   ResonanceBreathingWatch Watch App:
     type: application
     platform: watchOS
     sources:
       - "ResonanceBreathingWatch Watch App"
+      - path: ResonanceBreathing/Models
+        name: SharedModels
+      - path: ResonanceBreathing/Services/SessionConfiguration.swift
+        name: SharedServices
+      - path: ResonanceBreathing/Services/UserSettingsBootstrapper.swift
+        name: SharedServices
     dependencies:
       - package: BreathingCore
     settings:
       base:
         INFOPLIST_FILE: "ResonanceBreathingWatch Watch App/Info.plist"
         PRODUCT_BUNDLE_IDENTIFIER: com.lucascamillo.resonancebreathing.watchkitapp
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: J9ARL486CP
+        CODE_SIGN_IDENTITY: Apple Development
         SWIFT_VERSION: "5.9"
         SUPPORTED_PLATFORMS: "watchos watchsimulator"
     entitlements:
       path: "ResonanceBreathingWatch Watch App/ResonanceBreathingWatch.entitlements"
       properties:
         com.apple.developer.healthkit: true
-        com.apple.developer.healthkit.access: []
     scheme:
       testTargets: []
       gatherCoverageData: false

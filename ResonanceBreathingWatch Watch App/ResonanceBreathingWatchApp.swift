@@ -1,35 +1,22 @@
 import SwiftUI
+import SwiftData
 
 @main
 struct ResonanceBreathingWatchApp: App {
-    @StateObject private var workoutManager = WorkoutManager()
-    @StateObject private var phoneConnector = PhoneConnector()
-    @StateObject private var hapticEngine = HapticEngine()
+    @StateObject private var sessionManager = WatchSessionManager()
 
     var body: some Scene {
         WindowGroup {
-            WatchSessionView(
-                workoutManager: workoutManager,
-                phoneConnector: phoneConnector,
-                hapticEngine: hapticEngine
-            )
-            .onAppear {
-                workoutManager.requestAuthorization()
-                workoutManager.onHeartRateUpdate = { hr, rr in
-                    phoneConnector.sendHeartRateData(hr: hr, rrIntervals: rr)
-                }
-                phoneConnector.onCommand = { command in
-                    switch command {
-                    case "startWorkout":
-                        workoutManager.startWorkout()
-                        hapticEngine.start()
-                    case "stopWorkout":
-                        workoutManager.stopWorkout()
-                        hapticEngine.stop()
-                    default: break
+            WatchSessionView(sessionManager: sessionManager)
+                .onAppear {
+                    sessionManager.workoutManager.requestAuthorization()
+                    #if targetEnvironment(simulator)
+                    if ProcessInfo.processInfo.arguments.contains("-autoStartSession") {
+                        sessionManager.startSession()
                     }
+                    #endif
                 }
-            }
         }
+        .modelContainer(for: [BreathingSession.self, SessionDataPoint.self, UserSettings.self])
     }
 }

@@ -12,15 +12,22 @@ struct HRVChartView: View {
     let breathingRate: Double
     let isAdapting: Bool
 
+    private var statusText: String { isAdapting ? "Adapting" : "Locked" }
+    private var statusColor: Color { isAdapting ? AppTheme.warmAccent : AppTheme.success }
+
     var body: some View {
-        VStack(spacing: 4) {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Live HRV")
+                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .foregroundStyle(AppTheme.secondaryText)
+
             Chart(dataPoints) { point in
                 LineMark(
                     x: .value("Time", point.time),
                     y: .value("RMSSD", point.value)
                 )
-                .foregroundStyle(AppTheme.chartLine)
                 .interpolationMethod(.catmullRom)
+                .foregroundStyle(AppTheme.chartLine)
 
                 AreaMark(
                     x: .value("Time", point.time),
@@ -28,37 +35,37 @@ struct HRVChartView: View {
                 )
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [AppTheme.chartLine.opacity(0.3), .clear],
+                        colors: [AppTheme.chartLine.opacity(0.35), .clear],
                         startPoint: .top,
                         endPoint: .bottom
                     )
                 )
                 .interpolationMethod(.catmullRom)
             }
+            .frame(height: 104)
             .chartXAxis(.hidden)
-            .chartYAxis {
-                AxisMarks(position: .leading) { _ in
-                    AxisValueLabel()
-                        .foregroundStyle(AppTheme.secondaryText)
-                }
-            }
-            .frame(height: 80)
+            .chartYAxis(.hidden)
 
             HStack {
-                Text("Rate: \(String(format: "%.1f", breathingRate)) bpm")
+                Label(String(format: "%.1f bpm", breathingRate), systemImage: "wind")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(AppTheme.primaryText)
-                if isAdapting {
-                    Text("adapting")
-                        .foregroundStyle(AppTheme.petalTeal)
-                } else {
-                    Text("locked")
-                        .foregroundStyle(.green.opacity(0.8))
-                }
+
                 Spacer()
+
+                Text(statusText)
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(statusColor)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(
+                        Capsule().fill(statusColor.opacity(0.18))
+                    )
             }
-            .font(.system(.caption2, design: .monospaced))
         }
-        .padding(.horizontal)
+        .padding(14)
+        .mindfulCard(cornerRadius: 18)
+        .padding(.horizontal, 16)
     }
 }
 

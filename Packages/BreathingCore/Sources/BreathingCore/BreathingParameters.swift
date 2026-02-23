@@ -5,7 +5,7 @@ public struct BreathingParameters: Sendable, Equatable {
     public static let maxBPM: Double = 7.0
     public static let defaultBPM: Double = 5.5
     public static let inhaleRatio: Double = 0.4
-    public static let holdRatio: Double = 0.05
+    public static let holdRatio: Double = 0.0
 
     public let breathsPerMinute: Double
     public let inhaleDuration: Double

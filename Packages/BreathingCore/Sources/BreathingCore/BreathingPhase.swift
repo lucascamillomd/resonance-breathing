@@ -7,7 +7,7 @@ public enum BreathingPhase: String, CaseIterable, Sendable {
 
     public var next: BreathingPhase {
         switch self {
-        case .inhale: return .hold
+        case .inhale: return .exhale
         case .hold: return .exhale
         case .exhale: return .inhale
         }

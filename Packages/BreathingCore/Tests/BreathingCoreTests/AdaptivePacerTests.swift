@@ -50,4 +50,13 @@ final class AdaptivePacerTests: XCTestCase {
             XCTAssertLessThanOrEqual(bpm, BreathingParameters.maxBPM)
         }
     }
+
+    func testResonanceLockNudgesRateWhenCoherenceTrendDrops() {
+        let pacer = AdaptivePacer(calibrationDuration: 0.0, explorationDuration: 0.0, startingBPM: 5.5)
+        pacer.update(coherence: 0.9, elapsedTime: 0.1)
+        let lockedRate = pacer.currentParameters.breathsPerMinute
+
+        pacer.update(coherence: 0.7, elapsedTime: 3.2)
+        XCTAssertNotEqual(pacer.currentParameters.breathsPerMinute, lockedRate)
+    }
 }

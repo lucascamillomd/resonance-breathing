@@ -12,6 +12,7 @@ final class SessionManager: ObservableObject {
     @Published var elapsedSeconds: Double = 0
     @Published var sessionProgress: Double = 0
     @Published var hrvDataPoints: [HRVDataPoint] = []
+    @Published var hrTimeSeries: [(time: Double, hr: Double)] = []
 
     let timer: BreathingTimer
     let watchConnector: WatchConnector
@@ -71,6 +72,7 @@ final class SessionManager: ObservableObject {
         rmssd = 0
         coherence = 0
         hrvDataPoints = []
+        hrTimeSeries = []
         hrSamples = []
         rmssdHistory = []
         coherenceHistory = []
@@ -186,6 +188,10 @@ final class SessionManager: ObservableObject {
         if sample.heartRate > 0 {
             heartRate = sample.heartRate
             hrSamples.append(sample.heartRate)
+            hrTimeSeries.append((time: elapsedSeconds, hr: sample.heartRate))
+            if hrTimeSeries.count > 300 {
+                hrTimeSeries.removeFirst()
+            }
         }
 
         let relativeTimestamp = max(

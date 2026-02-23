@@ -12,7 +12,10 @@ final class WatchSessionManager: ObservableObject {
     @Published var elapsedSeconds: Double = 0
     @Published var sessionProgress: Double = 0
     @Published var currentPhase: BreathingPhase = .inhale
+    @Published var phaseProgress: Double = 0
     @Published var guidedBPM: Double = BreathingParameters.defaultBPM
+    @Published var hrTimeSeries: [(time: Double, hr: Double)] = []
+    @Published var rmssdTimeSeries: [(time: Double, value: Double)] = []
     @Published var pacerPhase: BayesianPacer.Phase = .warmup
     @Published private(set) var lastSession: BreathingSession?
 
@@ -51,6 +54,8 @@ final class WatchSessionManager: ObservableObject {
         rmssd = 0
         coherence = 0
         hrSamples = []
+        hrTimeSeries = []
+        rmssdTimeSeries = []
         rmssdHistory = []
         coherenceHistory = []
         sessionDataPoints = []
@@ -147,6 +152,10 @@ final class WatchSessionManager: ObservableObject {
         if hr > 0 {
             heartRate = hr
             hrSamples.append(hr)
+            hrTimeSeries.append((time: elapsedSeconds, hr: hr))
+            if hrTimeSeries.count > 200 {
+                hrTimeSeries.removeFirst()
+            }
         }
 
         for rr in rrIntervals where rr.isFinite && rr > 0 {
@@ -162,6 +171,10 @@ final class WatchSessionManager: ObservableObject {
         if let currentRMSSD = hrvAnalyzer.currentRMSSD(at: elapsedSeconds) {
             rmssd = currentRMSSD
             rmssdHistory.append(currentRMSSD)
+            rmssdTimeSeries.append((time: elapsedSeconds, value: currentRMSSD))
+            if rmssdTimeSeries.count > 200 {
+                rmssdTimeSeries.removeFirst()
+            }
         }
 
         if hrSamples.count >= 32 {
@@ -190,10 +203,10 @@ final class WatchSessionManager: ObservableObject {
 
         switch hapticEngine.currentPhase {
         case "inhale": currentPhase = .inhale
-        case "hold": currentPhase = .hold
         case "exhale": currentPhase = .exhale
         default: break
         }
+        phaseProgress = hapticEngine.phaseProgress
 
         captureDataPointIfNeeded()
 

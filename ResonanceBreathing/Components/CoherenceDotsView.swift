@@ -5,16 +5,17 @@ struct CoherenceDotsView: View {
     private let totalDots = 5
 
     var body: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 5) {
             ForEach(0..<totalDots, id: \.self) { index in
-                Circle()
+                Capsule()
                     .fill(index < activeDots ? AppTheme.coherenceActive : AppTheme.coherenceInactive)
-                    .frame(width: 8, height: 8)
+                    .frame(width: 12, height: 6)
             }
         }
     }
 
     private var activeDots: Int {
-        Int(round(score * Double(totalDots)))
+        let clamped = min(max(score, 0), 1)
+        return Int(round(clamped * Double(totalDots)))
     }
 }

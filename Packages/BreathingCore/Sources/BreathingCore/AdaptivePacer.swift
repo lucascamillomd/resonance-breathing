@@ -79,7 +79,7 @@ public final class AdaptivePacer: @unchecked Sendable {
 
         if elapsedTime - lastAdjustmentTime >= 3.0 {
             let recentCoherences = coherenceHistory.suffix(3).map(\.coherence)
-            let trend = recentCoherences.last ?? 0 - (recentCoherences.first ?? 0)
+            let trend = (recentCoherences.last ?? coherence) - (recentCoherences.first ?? coherence)
             if trend < -0.05 {
                 currentParameters = currentParameters.adjustedBy(stepSize * explorationDirection)
                 explorationDirection *= -1

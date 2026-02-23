@@ -18,6 +18,8 @@
     <true/>
     <key>NSHealthShareUsageDescription</key>
     <string>Resonance Breathing reads your heart rate during breathing sessions.</string>
+    <key>NSHealthUpdateUsageDescription</key>
+    <string>Resonance Breathing saves workout sessions to track your breathing practice.</string>
     <key>WKCompanionAppBundleIdentifier</key>
     <string>com.lucascamillo.resonancebreathing</string>
 </dict>

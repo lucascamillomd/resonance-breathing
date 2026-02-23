@@ -23,7 +23,7 @@ final class BayesianPacerTests: XCTestCase {
     }
 
     func testTransitionsToConvergedWhenUncertaintyLow() {
-        let pacer = BayesianPacer(warmupDuration: 2.0, convergenceThreshold: 0.5)
+        let pacer = BayesianPacer(warmupDuration: 2.0, convergenceThreshold: 0.3)
         for t in stride(from: 3.0, through: 120.0, by: 5.0) {
             let hrSamples = generateSinusoidalHR(seconds: 30, breathingFreqHz: 0.092, amplitude: 8.0)
             pacer.update(hrSamples: hrSamples, elapsedTime: t)
